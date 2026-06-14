@@ -1,1 +1,23 @@
+# Local tooling / editor
 .claude/
+
+# Python virtual environment
+.venv/
+
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Generated audit logs and attack results (runtime artifacts)
+gateway/audit/*.jsonl
+attack/results/*.json
+
+# OS noise
+.DS_Store
