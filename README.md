@@ -5,8 +5,7 @@
 MCPGuard sits between an AI agent and its MCP servers, intercepting tool definitions before they reach the LLM context, enforcing declarative argument-level policy on every tool call, and writing a tamper-evident audit trail. It also ships a runtime attack framework — a payload library and test harness that fires real attack classes against a vulnerable MCP server — so that the defense can be proven, not just claimed.
 
 > Built as a security research project at the intersection of agentic AI and applied AppSec.  
-> Author: Sriya Velagapudi · CMU INI MSIS '27 · [LinkedIn](https://linkedin.com/in/) · [sriyavelagapudi@cmu.edu]
-
+> Author: Sriya Katreddi · CMU INI MSIS '27 
 ---
 
 ## Why this exists
