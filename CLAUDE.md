@@ -23,7 +23,7 @@ attack blocked → report shows N/N blocked. That loop is the entire project in 
 
 ## Author context
 
-Built by Sriya Velagapudi:
+Built by Sriya Katreddi:
 - Security Engineering intern at Labelbox (ends Jul 31 2026) — internal POC running there
 - Incoming CMU INI MSIS student (fall 2026), concentrating in Secure AI or Software Security
 - Background: GraphQL API security testing (BOLA/IDOR), vuln management automation,
@@ -336,7 +336,8 @@ and what signals distinguish malicious from legitimate server packages?
 - `async/await` throughout the gateway — no blocking calls in the async path
 - Every public function has a docstring with Args/Returns
 - Test file for every module in `tests/`
-- Commit messages: `feat:`, `fix:`, `test:`, `docs:` prefixes
+- Code comments (`#`): lowercase, no articles (a/an/the), terse and direct; only for non-obvious intent. Docstrings stay normal prose with Args/Returns.
+- Commit messages: same style — lowercase, no articles, terse and direct, keep the `feat:`/`fix:`/`test:`/`docs:` prefix. Example: `feat: add payload base class contract`
 - Branch per module: `module-a-attack`, `module-b-gateway`, `module-c-report`
 - Tag each completed module: `v0.1-attacker`, `v0.2-gateway`, `v1.0`
 
