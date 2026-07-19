@@ -6,6 +6,7 @@ MCPGuard sits between an AI agent and its MCP servers, intercepting tool definit
 
 > Built as a security research project at the intersection of agentic AI and applied AppSec.  
 > Author: Sriya Katreddi · CMU INI MSIS '27 
+
 ---
 
 ## Why this exists
